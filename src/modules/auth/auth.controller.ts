@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { User } from '../user/user.entity';
+import { IToken } from 'src/types/token';
+import { AuthGuard } from '@nestjs/passport';
+import { AppAuthGuard } from 'src/gaurds/auth.gaurd';
 
 // @ApiBearerAuth()
 // @Roles(RoleEnum.admin)
@@ -16,12 +29,16 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto): Promise<LoginDto> {
+  @HttpCode(HttpStatus.UNAUTHORIZED)
+  async login(@Body() loginDto: LoginDto): Promise<IToken> {
     return await this.authService.login(loginDto);
   }
 
   @Get('me')
-  async fetchLoggedUser() {
-    return await this.authService.fetchLoggedInUser();
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AppAuthGuard)
+  @ApiBearerAuth()
+  async fetchLoggedUser(@Query() user: User) {
+    return await this.authService.me(user);
   }
 }

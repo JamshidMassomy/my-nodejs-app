@@ -22,7 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       keepConnectionAlive: true,
       logging:
         this.configService.get('app.env', { infer: true }) !== 'production',
-      entities: this.configService.getOrThrow('database.entities'),
+      entities: this.configService.get('database.entities', { infer: true }),
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
     } as TypeOrmModuleOptions;
   }
