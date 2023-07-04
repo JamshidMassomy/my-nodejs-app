@@ -1,13 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
-import { matchPassword } from 'src/util/password.helper';
-import { IncorrectPassword } from 'src/exceptions/incorrect_password.error';
-import { UserNotFoundError } from 'src/exceptions/user_not_found.error copy';
+import { matchPassword } from 'src/common/util/password.helper';
+import { IncorrectPasswordException } from 'src/common/exceptions/incorrect_password.error';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IToken } from 'src/types/token';
+import { NotFoundException } from 'src/common/exceptions/user_not_found.exception';
+import {
+  INCORRECT_PASSWORD,
+  USER_NOT_FOUND,
+} from 'src/common/constants/error.constant';
 
 @Injectable()
 export class AuthService {
@@ -17,11 +21,16 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
+  /**
+   * @description authenticatee with user
+   * @param payload loginDto
+   * @returns token
+   */
   async login(loginDto: LoginDto): Promise<IToken> {
     const user: User = await this.userService.findbyUserName(loginDto.username);
 
     if (!user) {
-      throw new UserNotFoundError();
+      throw new NotFoundException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const isValidPassword = await matchPassword(
@@ -30,17 +39,30 @@ export class AuthService {
     );
 
     if (!isValidPassword) {
-      throw new IncorrectPassword();
+      throw new IncorrectPasswordException(
+        INCORRECT_PASSWORD,
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     return await this.getTokenData();
   }
 
+  /**
+   * @description Validate the token and return the user
+   * @param payload string
+   * @returns User
+   */
   async me(user: User): Promise<User | string> {
     return 'hello';
     // return await this.userService.findMe(user.id);
   }
 
+  /**
+   * @description Validate the token and return the user
+   * @param payload string
+   * @returns User
+   */
   async getTokenData(): Promise<IToken> {
     const tokenExpiresIn = this.configService.getOrThrow('jwt.expires', {
       infer: true,

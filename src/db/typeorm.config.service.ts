@@ -23,7 +23,6 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       logging:
         this.configService.get('app.env', { infer: true }) !== 'production',
       entities: this.configService.get('database.entities', { infer: true }),
-      migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
     } as TypeOrmModuleOptions;
   }
 }

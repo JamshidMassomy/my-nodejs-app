@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDto } from './dtos/user.dto';
-import { encrypt } from 'src/util/password.helper';
+import { encrypt } from 'src/common/util/password.helper';
 
 @Injectable()
 export class UserService {
@@ -12,6 +12,11 @@ export class UserService {
     private readonly userRepositpry: Repository<User>,
   ) {}
 
+  /**
+   * @description Validate the token and return the user
+   * @param payload string
+   * @returns User
+   */
   async createUser(userDto: UserDto): Promise<User> {
     const user = new User();
     user.username = userDto.email;
@@ -20,10 +25,20 @@ export class UserService {
     return this.userRepositpry.save(user);
   }
 
+  /**
+   * @description Validate the token and return the user
+   * @param payload string
+   * @returns User
+   */
   async findbyUserName(username: string): Promise<User | undefined> {
     return await this.userRepositpry.findOne({ where: { username } });
   }
 
+  /**
+   * @description Validate the token and return the user
+   * @param payload string
+   * @returns User
+   */
   async findMe(id: number): Promise<User | undefined> {
     return await this.userRepositpry.findOne({ where: { id } });
   }
