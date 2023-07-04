@@ -12,7 +12,7 @@ export class User {
   @Index({
     unique: true,
   })
-  username: string;
+  email: string;
 
   @Column()
   @Exclude({

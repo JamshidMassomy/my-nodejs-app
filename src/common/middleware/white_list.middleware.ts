@@ -3,11 +3,7 @@ import { UNAUTHORIZED_ERROR } from '../constants/error.constant';
 
 @Injectable()
 export class WhitelistMiddleware implements NestMiddleware {
-  private readonly allowedPaths: string[] = [
-    '/public',
-    '/health-check',
-    '/auth/login',
-  ];
+  private readonly allowedPaths: string[] = ['/public', '/health-check'];
 
   use(req: any, res: any, next: any) {
     const isAllowed = this.allowedPaths.some((path) =>

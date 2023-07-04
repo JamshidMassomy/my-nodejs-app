@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
@@ -45,7 +45,7 @@ export class AuthService {
       );
     }
 
-    return await this.getTokenData();
+    return await this.getTokenData(user);
   }
 
   /**
@@ -53,9 +53,13 @@ export class AuthService {
    * @param payload string
    * @returns User
    */
-  async me(user: User): Promise<User | string> {
-    return 'hello';
-    // return await this.userService.findMe(user.id);
+  async me(request: any): Promise<User | any> {
+    if (request?.user) {
+      const user = request.user;
+      return { id: user.id, email: user.email };
+    } else {
+      throw new UnauthorizedException('Unauthorized or user profile not found');
+    }
   }
 
   /**
@@ -63,43 +67,29 @@ export class AuthService {
    * @param payload string
    * @returns User
    */
-  async getTokenData(): Promise<IToken> {
+  async getTokenData(user: User): Promise<IToken> {
     const tokenExpiresIn = this.configService.getOrThrow('jwt.expires', {
       infer: true,
     });
 
     // const tokenExpires = Date.now() + ms(tokenExpiresIn);
     const tokenExpires = Date.now() + tokenExpiresIn;
-    const [token, refreshToken] = await Promise.all([
+    const [token] = await Promise.all([
       await this.jwtService.signAsync(
         {
-          id: 1,
-          role: 'Admin',
-          sessionId: '342',
+          id: user.id,
+          email: user.email,
         },
         {
           secret: this.configService.getOrThrow('jwt.secret', { infer: true }),
-          expiresIn: 234234234,
-        },
-      ),
-      await this.jwtService.signAsync(
-        {
-          sessionId: '324234',
-        },
-        {
-          secret: this.configService.getOrThrow('jwt.refreshSecret', {
-            infer: true,
-          }),
           expiresIn: this.configService.getOrThrow('jwt.refreshExpires', {
             infer: true,
           }),
         },
       ),
     ]);
-    console.log('token', token);
     return {
       token,
-      refreshToken,
       tokenExpires,
     };
   }

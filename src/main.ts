@@ -2,6 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './modules/app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import {
+  SWAGGER_DESCRIPTION,
+  SWAGGER_TITLE,
+  SWAGGER_VERSION,
+} from './common/constants/swagger.constant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,9 +22,9 @@ async function bootstrap() {
   // app use piplinees and validation
   // tests
   const options = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('API docs')
-    .setVersion('1.0')
+    .setTitle(SWAGGER_TITLE)
+    .setDescription(SWAGGER_DESCRIPTION)
+    .setVersion(SWAGGER_VERSION)
     .addBearerAuth()
     .build();
 

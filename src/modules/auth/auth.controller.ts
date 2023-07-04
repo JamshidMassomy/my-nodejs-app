@@ -5,13 +5,12 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { User } from '../user/user.entity';
 import { IToken } from 'src/types/token';
 import { AppAuthGuard } from 'src/common/gaurd/app.gaurd';
 import { Public } from 'src/common/constants/public.constant';
@@ -36,7 +35,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AppAuthGuard)
   @ApiBearerAuth()
-  async fetchMe(@Query() user: User) {
-    return await this.authService.me(user);
+  async fetchMe(@Request() request) {
+    return await this.authService.me(request);
   }
 }

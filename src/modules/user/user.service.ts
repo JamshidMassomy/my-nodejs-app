@@ -19,9 +19,8 @@ export class UserService {
    */
   async createUser(userDto: UserDto): Promise<User> {
     const user = new User();
-    user.username = userDto.email;
+    user.email = userDto.email;
     user.password = await encrypt(userDto.password);
-    // user.password = await bcrypt.hash(userDto.password, 10);
     return this.userRepositpry.save(user);
   }
 
@@ -30,8 +29,8 @@ export class UserService {
    * @param payload string
    * @returns User
    */
-  async findbyUserName(username: string): Promise<User | undefined> {
-    return await this.userRepositpry.findOne({ where: { username } });
+  async findbyUserName(email: string): Promise<User | undefined> {
+    return await this.userRepositpry.findOne({ where: { email } });
   }
 
   /**
