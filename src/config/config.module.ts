@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './database.config';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmConfigService } from 'src/db/typeorm.config.service';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import jwtConfig from './jwt.config';
 import appConfig from './app.config';
+import { IsExist } from 'src/common/util/exisits.validator';
+import { IsNotExist } from 'src/common/util/not_exists.validator';
 
 @Module({
   imports: [
@@ -20,7 +22,6 @@ import appConfig from './app.config';
       },
     }),
   ],
-  exports: [],
-  providers: [],
+  providers: [IsExist, IsNotExist],
 })
 export class AppConfigModule {}

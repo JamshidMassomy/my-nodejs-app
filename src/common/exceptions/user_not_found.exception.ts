@@ -7,7 +7,6 @@ export class NotFoundException extends HttpException {
       {
         message: message || NOT_FOUND,
         code: code || HttpStatus.NOT_FOUND,
-        error: true,
       },
       HttpStatus.NOT_FOUND,
     );

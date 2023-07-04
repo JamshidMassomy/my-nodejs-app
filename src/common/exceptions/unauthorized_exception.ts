@@ -7,7 +7,6 @@ export class UnauthorizedException extends HttpException {
       {
         message: message || UNAUTHORIZED_ERROR,
         code: code || HttpStatus.UNAUTHORIZED,
-        error: true,
       },
       HttpStatus.UNAUTHORIZED,
     );

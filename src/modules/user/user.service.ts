@@ -13,8 +13,8 @@ export class UserService {
   ) {}
 
   /**
-   * @description Validate the token and return the user
-   * @param payload string
+   * @description Create new user
+   * @param payload userDto
    * @returns User
    */
   async createUser(userDto: UserDto): Promise<User> {
@@ -25,20 +25,11 @@ export class UserService {
   }
 
   /**
-   * @description Validate the token and return the user
-   * @param payload string
+   * @description Find user by email
+   * @param payload email: string
    * @returns User
    */
   async findbyUserName(email: string): Promise<User | undefined> {
     return await this.userRepositpry.findOne({ where: { email } });
-  }
-
-  /**
-   * @description Validate the token and return the user
-   * @param payload string
-   * @returns User
-   */
-  async findMe(id: number): Promise<User | undefined> {
-    return await this.userRepositpry.findOne({ where: { id } });
   }
 }

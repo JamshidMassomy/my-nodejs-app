@@ -1,10 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
+import { UNAUTHORIZED_ERROR } from 'src/common/constants/error.constant';
+import { UnauthorizedException } from 'src/common/exceptions/unauthorized_exception';
 
 @Injectable()
 export class AppAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
@@ -13,11 +24,17 @@ export class AppAuthGuard implements CanActivate {
     const token = request.headers.authorization?.split(' ')[1];
     if (token) {
       try {
-        const decodedToken = this.jwtService.verify(token);
+        const decodedToken = this.jwtService.verifyAsync(token, {
+          secret: this.configService.getOrThrow('jwt.secret', { infer: true }),
+        });
         request.user = decodedToken;
-        console.log(request.user);
         return true;
-      } catch (err) {}
+      } catch {
+        throw new UnauthorizedException(
+          UNAUTHORIZED_ERROR,
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
     }
 
     return false;

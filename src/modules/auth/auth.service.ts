@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
@@ -10,8 +10,14 @@ import { IToken } from 'src/types/token';
 import { NotFoundException } from 'src/common/exceptions/user_not_found.exception';
 import {
   INCORRECT_PASSWORD,
+  UNAUTHORIZED_ERROR,
   USER_NOT_FOUND,
 } from 'src/common/constants/error.constant';
+import { UnauthorizedException } from 'src/common/exceptions/unauthorized_exception';
+import {
+  JWT_EXPIRE_KEY,
+  JWT_SECRET_KEY,
+} from 'src/common/constants/public.constant';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +28,7 @@ export class AuthService {
   ) {}
 
   /**
-   * @description authenticatee with user
+   * @description Authenticatee with username and password
    * @param payload loginDto
    * @returns token
    */
@@ -49,8 +55,8 @@ export class AuthService {
   }
 
   /**
-   * @description Validate the token and return the user
-   * @param payload string
+   * @description Fetch current loggedin user
+   * @param payload Request
    * @returns User
    */
   async me(request: any): Promise<User | any> {
@@ -58,14 +64,17 @@ export class AuthService {
       const user = request.user;
       return { id: user.id, email: user.email };
     } else {
-      throw new UnauthorizedException('Unauthorized or user profile not found');
+      throw new UnauthorizedException(
+        UNAUTHORIZED_ERROR,
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 
   /**
-   * @description Validate the token and return the user
-   * @param payload string
-   * @returns User
+   * @description Generate jwt token
+   * @param payload User
+   * @returns IToken
    */
   async getTokenData(user: User): Promise<IToken> {
     const tokenExpiresIn = this.configService.getOrThrow('jwt.expires', {
@@ -81,8 +90,10 @@ export class AuthService {
           email: user.email,
         },
         {
-          secret: this.configService.getOrThrow('jwt.secret', { infer: true }),
-          expiresIn: this.configService.getOrThrow('jwt.refreshExpires', {
+          secret: this.configService.getOrThrow(JWT_SECRET_KEY, {
+            infer: true,
+          }),
+          expiresIn: this.configService.getOrThrow(JWT_EXPIRE_KEY, {
             infer: true,
           }),
         },
