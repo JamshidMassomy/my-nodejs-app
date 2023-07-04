@@ -30,17 +30,11 @@
 
 This app has following endpoints
 
-# auth/login : POST -> public
+# Endpoints
 
-login user via {email and password}
-
-# auth/me: GET -> lock
-
-fetch the current logged in user
-
-# /user: POST
-
-Creates new user
+auth/login : POST login user via {email and password}
+auth/me: GET fetch the current logged in user
+/user: POST Creates new user
 
 ```bash
 $ npm install
