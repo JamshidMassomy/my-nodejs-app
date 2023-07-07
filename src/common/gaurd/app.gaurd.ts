@@ -33,7 +33,7 @@ export class AppAuthGuard implements CanActivate {
     } else {
       try {
         const payload = await this.jwtService.verifyAsync(token, {
-          secret: this.configService.getOrThrow('jwt.secret', { infer: true }),
+          secret: this.configService.getOrThrow('jwt.secret'),
         });
         request['user'] = payload;
         return true;

@@ -69,9 +69,7 @@ export class AuthService {
    * @returns IToken
    */
   async getTokenData(user: User): Promise<IToken> {
-    const tokenExpiresIn = this.configService.getOrThrow('jwt.expires', {
-      infer: true,
-    });
+    const tokenExpiresIn = this.configService.getOrThrow('jwt.expires');
 
     const [token] = await Promise.all([
       await this.jwtService.signAsync(
@@ -80,12 +78,8 @@ export class AuthService {
           email: user.email,
         },
         {
-          secret: this.configService.getOrThrow(JWT_SECRET_KEY, {
-            infer: true,
-          }),
-          expiresIn: this.configService.getOrThrow(JWT_EXPIRE_KEY, {
-            infer: true,
-          }),
+          secret: this.configService.getOrThrow(JWT_SECRET_KEY),
+          expiresIn: this.configService.getOrThrow(JWT_EXPIRE_KEY),
         },
       ),
     ]);
