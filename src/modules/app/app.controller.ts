@@ -1,14 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/common/constants/public.constant';
 
-@ApiTags('App')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('test')
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('/health-check')
+  @Public()
+  healthCheck(): string {
+    return this.appService.healthCheck();
+  }
+
+  @Get('/echo')
+  @Public()
+  getEcho(@Req() req, @Res() res, @Body() body) {
+    res.status(200).json(body);
   }
 }

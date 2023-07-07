@@ -3,21 +3,19 @@ import { LoginDto } from './dto/login.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
 import { matchPassword } from 'src/common/util/password.helper';
-import { IncorrectPasswordException } from 'src/common/exceptions/incorrect_password.error';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IToken } from 'src/types/token';
-import { NotFoundException } from 'src/common/exceptions/user_not_found.exception';
 import {
   INCORRECT_PASSWORD,
   UNAUTHORIZED_ERROR,
   USER_NOT_FOUND,
 } from 'src/common/constants/error.constant';
-import { UnauthorizedException } from 'src/common/exceptions/unauthorized_exception';
 import {
   JWT_EXPIRE_KEY,
   JWT_SECRET_KEY,
 } from 'src/common/constants/public.constant';
+import { CustomeException } from 'src/common/exceptions/custom.exception';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +34,7 @@ export class AuthService {
     const user: User = await this.userService.findbyUserName(loginDto.username);
 
     if (!user) {
-      throw new NotFoundException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+      throw new CustomeException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const isValidPassword = await matchPassword(
@@ -45,10 +43,7 @@ export class AuthService {
     );
 
     if (!isValidPassword) {
-      throw new IncorrectPasswordException(
-        INCORRECT_PASSWORD,
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new CustomeException(INCORRECT_PASSWORD, HttpStatus.UNAUTHORIZED);
     }
 
     return await this.getTokenData(user);
@@ -64,10 +59,7 @@ export class AuthService {
       const user = request.user;
       return { id: user.id, email: user.email };
     } else {
-      throw new UnauthorizedException(
-        UNAUTHORIZED_ERROR,
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new CustomeException(UNAUTHORIZED_ERROR, HttpStatus.UNAUTHORIZED);
     }
   }
 
@@ -81,8 +73,6 @@ export class AuthService {
       infer: true,
     });
 
-    // const tokenExpires = Date.now() + ms(tokenExpiresIn);
-    const tokenExpires = Date.now() + tokenExpiresIn;
     const [token] = await Promise.all([
       await this.jwtService.signAsync(
         {
@@ -101,10 +91,7 @@ export class AuthService {
     ]);
     return {
       token,
-      tokenExpires,
+      tokenExpiresIn,
     };
   }
-  // validate passord
-  // validate input strong password and username
-  // validate
 }

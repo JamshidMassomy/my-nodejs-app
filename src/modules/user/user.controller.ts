@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserDto } from './dtos/user.dto';
@@ -14,6 +14,7 @@ export class UserController {
 
   @Post()
   @Public()
+  @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userDto: UserDto) {
     await this.userService.createUser(userDto);
   }

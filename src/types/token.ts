@@ -1,4 +1,4 @@
 export interface IToken {
   token: string;
-  tokenExpires: any;
+  tokenExpiresIn: any;
 }

@@ -8,7 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { UNAUTHORIZED_ERROR } from 'src/common/constants/error.constant';
-import { UnauthorizedException } from 'src/common/exceptions/unauthorized_exception';
+import { JWT_SECRET_KEY } from 'src/common/constants/public.constant';
+import { CustomeException } from 'src/common/exceptions/custom.exception';
 
 @Injectable()
 export class AppAuthGuard implements CanActivate {
@@ -25,15 +26,14 @@ export class AppAuthGuard implements CanActivate {
     if (token) {
       try {
         const decodedToken = this.jwtService.verifyAsync(token, {
-          secret: this.configService.getOrThrow('jwt.secret', { infer: true }),
+          secret: this.configService.getOrThrow(JWT_SECRET_KEY, {
+            infer: true,
+          }),
         });
         request.user = decodedToken;
         return true;
       } catch {
-        throw new UnauthorizedException(
-          UNAUTHORIZED_ERROR,
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw new CustomeException(UNAUTHORIZED_ERROR, HttpStatus.UNAUTHORIZED);
       }
     }
 

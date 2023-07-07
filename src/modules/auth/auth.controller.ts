@@ -16,7 +16,6 @@ import { AppAuthGuard } from 'src/common/gaurd/app.gaurd';
 import { Public } from 'src/common/constants/public.constant';
 
 @ApiTags('Auth')
-// @UsePipes(new ValidationPipe())
 @Controller({
   path: 'auth',
   version: '1',

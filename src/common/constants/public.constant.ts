@@ -2,6 +2,7 @@ import { SetMetadata } from '@nestjs/common';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const API_PREFIX = 'api';
 
 /** =================JWT=================== */
 export const JWT_SECRET_KEY = 'jwt.secret';

@@ -1,12 +1,5 @@
 import { registerAs } from '@nestjs/config';
 
-enum Environment {
-  Development = 'development',
-  Production = 'production',
-}
-
-// validate config
-
 export default registerAs(
   'app',
   (): Record<string, any> => ({
